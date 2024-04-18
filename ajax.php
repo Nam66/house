@@ -97,5 +97,16 @@ if($action == "delete_payment"){
 		echo $save;
 }
 
+if($action == "calculate_payment"){
+	$save = $crud->calculate_payment();
+	if($save)
+		echo $save;
+}
+if($action == "update_payment"){
+	$save = $crud->update_payment();
+	if($save)
+		echo $save;
+}
+
 ob_end_flush();
 ?>

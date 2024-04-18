@@ -45,10 +45,8 @@
 										<th>Tenant</th>
 										<th>House #</th>
 										<th>Monthly Rate</th>
-										<th>Payable Months</th>
-										<th>Payable Amount</th>
-										<th>Paid</th>
-										<th>Outstanding Balance</th>
+										<th>Total Amount</th>
+										<th>Last Payment Paid</th>
 										<th>Last Payment</th>
 									</tr>
 								</thead>
@@ -56,29 +54,31 @@
 									<?php 
 									$i = 1;
 									// $tamount = 0;
-									$tenants =$conn->query("SELECT t.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id where t.status = 1 order by h.house_no desc ");
+									$tenants =$conn->query("SELECT t.*, u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on t.user_id = u.id where t.status = 1 order by h.house_no desc ");
 									if($tenants->num_rows > 0):
 									while($row=$tenants->fetch_assoc()):
-										$months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($row['date_in']." 23:59:59"));
-										$months = floor(($months) / (30*60*60*24));
-										$payable = $row['price'] * $months;
-										$paid = $conn->query("SELECT SUM(amount) as paid FROM payments where tenant_id =".$row['id']);
-										$last_payment = $conn->query("SELECT * FROM payments where tenant_id =".$row['id']." order by unix_timestamp(date_created) desc limit 1");
-										$paid = $paid->num_rows > 0 ? $paid->fetch_array()['paid'] : 0;
-										$last_payment = $last_payment->num_rows > 0 ? date("M d, Y",strtotime($last_payment->fetch_array()['date_created'])) : 'N/A';
-										$outstanding = $payable - $paid;
+										$paid = $conn->query("SELECT SUM(total_amount) as paid FROM payments where status = 1 and tenant_id =".$row['id']);
+										if (!empty($paid->fetch_array()['paid'])):
+											print_r($paid->fetch_array());
+											$months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($row['date_in']." 23:59:59"));
+											$months = floor(($months) / (30*60*60*24));
+											$payable = $row['price'] * $months;
+											$last_payment = $conn->query("SELECT * FROM payments where tenant_id =".$row['id']." and status = 1 order by unix_timestamp(date_created) desc limit 1");
+											$last_paymentCheck = $last_payment->fetch_array();
+											$paid = $paid->num_rows > 0 ? $last_paymentCheck['total_amount'] : 0;
+											$last_payment = $last_payment->num_rows > 0 ? date("M d, Y",strtotime($last_paymentCheck['date_created'])) : 'N/A';
+											$outstanding = $payable - $paid;
 									?>
 									<tr>
 										<td><?php echo $i++ ?></td>
 										<td><?php echo ucwords($row['name']) ?></td>
 										<td><?php echo $row['house_no'] ?></td>
 										<td class="text-right"><?php echo number_format($row['price'],2) ?></td>
-										<td class="text-right"><?php echo $months.' mo/s' ?></td>
-										<td class="text-right"><?php echo number_format($payable,2) ?></td>
 										<td class="text-right"><?php echo number_format($paid,2) ?></td>
 										<td class="text-right"><?php echo number_format($outstanding,2) ?></td>
 										<td><?php echo date('M d,Y',strtotime($last_payment)) ?></td>
 									</tr>
+									<?php endif;?>
 								<?php endwhile; ?>
 								<?php else: ?>
 									<tr>

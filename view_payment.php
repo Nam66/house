@@ -1,8 +1,8 @@
 <?php include 'db_connect.php' ?>
 
 <?php 
-$tenants =$conn->query("SELECT t.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id where t.id = {$_GET['id']} ");
-foreach($tenants->fetch_array() as $k => $v){
+$tenants = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price,h.electricity_number,h.water_meter FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where t.status = 1 order by h.house_no desc ")->fetch_array();
+foreach($tenants as $k => $v){
 	if(!is_numeric($k)){
 		$$k = $v;
 	}
@@ -26,10 +26,11 @@ $outstanding = $payable - $paid;
 					<hr>
 					<p>Tenant: <b><?php echo ucwords($name) ?></b></p>
 					<p>Monthly Rental Rate: <b><?php echo number_format($price,2) ?></b></p>
-					<p>Outstanding Balance: <b><?php echo number_format($outstanding,2) ?></b></p>
+					<p>Electricity Number: <b><?php echo $tenants['electricity_number'] ?></b></p>
+					<p>water meter: <b><?php echo $tenants['water_meter'] ?></b></p>
+					<p>Monthly Rental Rate: <b><?php echo number_format($price,2) ?></b></p>
 					<p>Total Paid: <b><?php echo number_format($paid,2) ?></b></p>
 					<p>Rent Started: <b><?php echo date("M d, Y",strtotime($date_in)) ?></b></p>
-					<p>Payable Months: <b><?php echo $months ?></b></p>
 				</div>
 			</div>
 			<div class="col-md-8">
@@ -39,7 +40,6 @@ $outstanding = $payable - $paid;
 					<thead>
 						<tr>
 							<th>Date</th>
-							<th>Invoice</th>
 							<th>Amount</th>
 						</tr>
 					</thead>
@@ -51,8 +51,7 @@ $outstanding = $payable - $paid;
 						?>
 					<tr>
 						<td><?php echo date("M d, Y",strtotime($row['date_created'])) ?></td>
-						<td><?php echo $row['invoice'] ?></td>
-						<td class='text-right'><?php echo number_format($row['amount'],2) ?></td>
+						<td class='text-right'><?php echo number_format($row['total_amount'],2) ?></td>
 					</tr>
 					<?php endwhile; ?>
 					<?php else: ?>

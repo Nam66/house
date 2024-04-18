@@ -87,9 +87,12 @@ Class Action {
 		extract($_POST);
 		$data = " name = '$name' ";
 		$data .= ", username = '$username' ";
+		$data .= ", email = '$email' ";
+		$data .= ", phone = '$phone' ";
 		if(!empty($password))
-		$data .= ", password = '".md5($password)."' ";
-		$data .= ", type = '$type' ";
+			$data .= ", password = '".md5($password)."' ";
+		if(isset($type))
+			$data .= ", type = '$type' ";
 		// if($type == 1)
 		// 	$establishment_id = 0;
 		// $data .= ", establishment_id = '$establishment_id' ";
@@ -246,17 +249,15 @@ Class Action {
 		$data = " house_no = '$house_no' ";
 		$data .= ", description = '$description' ";
 		$data .= ", category_id = '$category_id' ";
+		$data .= ", electricity_number = '$electricity_number' ";
+		$data .= ", water_meter = '$water_meter' ";
 		$data .= ", price = '$price' ";
 		$chk = $this->db->query("SELECT * FROM houses where house_no = '$house_no' ")->num_rows;
 		if($chk > 0 ){
-			return 2;
-			exit;
+			$save = $this->db->query("UPDATE houses set $data where id = $id");
+		}else {
+			$save = $this->db->query("INSERT INTO houses set $data");
 		}
-			if(empty($id)){
-				$save = $this->db->query("INSERT INTO houses set $data");
-			}else{
-				$save = $this->db->query("UPDATE houses set $data where id = $id");
-			}
 		if($save)
 			return 1;
 	}
@@ -269,15 +270,10 @@ Class Action {
 	}
 	function save_tenant(){
 		extract($_POST);
-		$data = " firstname = '$firstname' ";
-		$data .= ", lastname = '$lastname' ";
-		$data .= ", middlename = '$middlename' ";
-		$data .= ", email = '$email' ";
-		$data .= ", contact = '$contact' ";
+		$data = " user_id = '$user_id' ";
 		$data .= ", house_id = '$house_id' ";
 		$data .= ", date_in = '$date_in' ";
 			if(empty($id)){
-				
 				$save = $this->db->query("INSERT INTO tenants set $data");
 			}else{
 				$save = $this->db->query("UPDATE tenants set $data where id = $id");
@@ -294,8 +290,8 @@ Class Action {
 	}
 	function get_tdetails(){
 		extract($_POST);
-		$data =array();
-		$tenants =$this->db->query("SELECT t.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id where t.id = {$id} ");
+		$data = array();
+		$tenants =$this->db->query("SELECT t.*,u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where t.id = {$id} ");
 		foreach($tenants->fetch_array() as $k => $v){
 			if(!is_numeric($k)){
 				$$k = $v;
@@ -321,8 +317,22 @@ Class Action {
 	
 	function save_payment(){
 		extract($_POST);
+		$POST = $_POST;
+		$tenants =$this->db->query("SELECT t.*,u.name as name,h.* FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where t.id = {$tenant_id} ")->fetch_array();
+		$house_electricity_number = $tenants['electricity_number'];
+		$house_water_meter = $tenants['water_meter'];
+		$electricity_price = $electricity_number * $house_electricity_number;
+		$water_price = $house_water_meter * $water_number;
+		$total_amount = $tenants['price'] + $electricity_price + $water_price;
+		$POST['electricity_price'] =  $electricity_price;
+		$POST['water_price'] =  $water_price;
+		$POST['electricity_number'] =  $electricity_number;
+		$POST['water_number'] =  $water_number;
+		$POST['total_amount'] =  $total_amount;
+		$POST['amount'] =  $tenants['price'];
+		$POST['status'] =  0;
 		$data = "";
-		foreach($_POST as $k => $v){
+		foreach($POST as $k => $v){
 			if(!in_array($k, array('id','ref_code')) && !is_numeric($k)){
 				if(empty($data)){
 					$data .= " $k='$v' ";
@@ -346,6 +356,61 @@ Class Action {
 		extract($_POST);
 		$delete = $this->db->query("DELETE FROM payments where id = ".$id);
 		if($delete){
+			return 1;
+		}
+	}
+	function calculate_payment(){
+		extract($_POST);
+		$tenants =$this->db->query("SELECT * FROM tenants t inner join houses h on h.id = t.house_id where t.id = {$id} ")->fetch_array();
+		if(empty($tenants)) { 
+			return 2;
+		}
+		$electricity_price = $tenants['electricity_number'];
+		$price = $tenants['price'];
+		$house_electricity_number = $tenants['electricity_number'];
+		$house_water_meter = $tenants['water_meter'];
+		$electricity_price = $electricity_number * $house_electricity_number;
+		$water_price = $house_water_meter * $water_number;
+		$total_amount = $tenants['price'] + $electricity_price + $water_price;
+		$POST['electricity_price'] =  $electricity_price;
+		$POST['water_price'] =  $water_price;
+		$POST['electricity_number'] =  $electricity_number;
+		$POST['water_number'] =  $water_number;
+		$POST['total_amount'] =  $total_amount;
+		$POST['tenant_id'] =  $id;
+		$POST['amount'] =  $price;
+		$POST['status'] =  0;
+		$data = "";
+		foreach($POST as $k => $v){
+			if(!in_array($k, array('id','ref_code')) && !is_numeric($k)){
+				if(empty($data)){
+					$data .= " $k='$v' ";
+				}else{
+					$data .= ", $k='$v' ";
+				}
+			}
+		}
+		if(empty($payment_id)){
+			$save = $this->db->query("INSERT INTO payments set $data");
+			$payment_id = $this->db->insert_id;
+		}else{
+			$save = $this->db->query("UPDATE payments set $data where id = $payment_id");
+		}
+
+		if($save){
+			return 1;
+		}
+	}
+
+	function update_payment(){
+		extract($_POST);
+		$payment =$this->db->query("SELECT * FROM payments where id = {$id} ")->fetch_array();
+		print($payment['status']);
+		if ($payment['status'] == 1) {
+			return 1;
+		}
+		$update = $this->db->query("UPDATE payments set status=1 where id = $id");
+		if($update){
 			return 1;
 		}
 	}

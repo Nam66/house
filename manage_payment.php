@@ -17,26 +17,21 @@ foreach($qry->fetch_array() as $k => $val){
                 <option value=""></option>
 
             <?php 
-            $tenant = $conn->query("SELECT *,concat(lastname,', ',firstname,' ',middlename) as name FROM tenants where status = 1 order by name asc");
+            $tenant = $conn->query("SELECT *, u.name as name, t.id as id FROM tenants as t inner join users u on u.id = t.user_id where status = 1 order by name asc");
             while($row=$tenant->fetch_assoc()):
             ?>
             <option value="<?php echo $row['id'] ?>" <?php echo isset($tenant_id) && $tenant_id == $row['id'] ? 'selected' : '' ?>><?php echo ucwords($row['name']) ?></option>
             <?php endwhile; ?>
             </select>
         </div>
-        <div class="form-group" id="details">
-            
-        </div>
-
         <div class="form-group">
-            <label for="" class="control-label">Invoice: </label>
-            <input type="text" class="form-control" name="invoice"  value="<?php echo isset($invoice) ? $invoice :'' ?>" >
+            <label for="" class="control-label">Electricity Number: </label>
+            <input type="text" class="form-control" name="electricity_number"  value="<?php echo isset($electricity_number) ? $electricity_number :'' ?>" >
         </div>
         <div class="form-group">
-            <label for="" class="control-label">Amount Paid: </label>
-            <input type="number" class="form-control text-right" step="any" name="amount"  value="<?php echo isset($amount) ? $amount :'' ?>" >
+            <label for="" class="control-label">Water Number: </label>
+            <input type="number" class="form-control text-right" step="any" name="water_number"  value="<?php echo isset($water_number) ? $water_number :'' ?>" >
         </div>
-</div>
     </form>
 </div>
 <div id="details_clone" style="display: none">

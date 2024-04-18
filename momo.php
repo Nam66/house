@@ -1,5 +1,6 @@
 <?php
 header('Content-type: text/html; charset=utf-8');
+include 'db_connect.php';
 
 
 function execPostRequest($url, $data)
@@ -29,26 +30,23 @@ $partnerCode = 'MOMOBKUN20180529';
 $accessKey = 'klm05TvNBzhg7h7j';
 $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
 $orderInfo = "Thanh toán qua MoMo";
-$amount = "10000";
+$amount = "100000";
 $orderId = time() ."";
 $redirectUrl = "http://localhost/house_rental/index.php?page=invoices";
 $ipnUrl = "http://localhost/house_rental/index.php?page=invoices";
 $extraData = "";
 
 
-// if (!empty($_POST)) {
-    // $partnerCode = $_POST["partnerCode"];
-    // $accessKey = $_POST["accessKey"];
-    // $serectkey = $_POST["secretKey"];
-    // $orderId = $_POST["orderId"]; // Mã đơn hàng
-    // $orderInfo = $_POST["orderInfo"];
-    // $amount = $_POST["amount"];
-    // $ipnUrl = $_POST["ipnUrl"];
-    // $redirectUrl = $_POST["redirectUrl"];
-    // $extraData = $_POST["extraData"];
+if (!empty($_POST)):
+    $id = $_POST["id"];
+    $extraData = $id;
+    $invoices = $conn->query("SELECT * FROM payments where id=$id and status = 0")->fetch_array();
+    $amount = $invoices['total_amount'];
+endif;
+
 
     $requestId = time() . "";
-    $requestType = "captureWallet";
+    $requestType = "payWithATM";
     // $extraData = ($_POST["extraData"] ? $_POST["extraData"] : "");
     //before sign HMAC SHA256 signature
     $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;

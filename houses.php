@@ -41,6 +41,14 @@
 								<label class="control-label">Price</label>
 								<input type="number" class="form-control text-right" name="price" step="any" required="">
 							</div>
+							<div class="form-group">
+								<label class="control-label">Electric number price</label>
+								<input type="number" class="form-control text-right" name="electricity_number" step="any" required="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">Water meter price</label>
+								<input type="number" class="form-control text-right" name="water_meter" step="any" required="">
+							</div>
 					</div>
 					<div class="card-footer">
 						<div class="row">
@@ -85,7 +93,7 @@
 										<p><small>Price: <b><?php echo number_format($row['price'],2) ?></b></small></p>
 									</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-primary edit_house" type="button" data-id="<?php echo $row['id'] ?>"  data-house_no="<?php echo $row['house_no'] ?>" data-description="<?php echo $row['description'] ?>" data-category_id="<?php echo $row['category_id'] ?>" data-price="<?php echo $row['price'] ?>" >Edit</button>
+										<button class="btn btn-sm btn-primary edit_house" type="button" data-id="<?php echo $row['id'] ?>"  data-house_no="<?php echo $row['house_no'] ?>" data-description="<?php echo $row['description'] ?>" data-category_id="<?php echo $row['category_id'] ?>" data-price="<?php echo $row['price'] ?>" data-electricity_number="<?php echo $row['electricity_number'] ?>" data-water_meter="<?php echo $row['water_meter'] ?>" >Edit</button>
 										<button class="btn btn-sm btn-danger delete_house" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
 									</td>
 								</tr>
@@ -150,7 +158,8 @@
 		cat.find("[name='house_no']").val($(this).attr('data-house_no'))
 		cat.find("[name='description']").val($(this).attr('data-description'))
 		cat.find("[name='price']").val($(this).attr('data-price'))
-		cat.find("[name='category_id']").val($(this).attr('data-category_id'))
+		cat.find("[name='electricity_number']").val($(this).attr('data-electricity_number'))
+		cat.find("[name='water_meter']").val($(this).attr('data-water_meter'))
 		end_load()
 	})
 	$('.delete_house').click(function(){

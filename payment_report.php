@@ -57,7 +57,6 @@ $month_of = isset($_GET['month_of']) ? $_GET['month_of'] : date('Y-m');
 										<th>Date</th>
 										<th>Tenant</th>
 										<th>House #</th>
-										<th>Invoice</th>
 										<th>Amount</th>
 									</tr>
 								</thead>
@@ -65,18 +64,17 @@ $month_of = isset($_GET['month_of']) ? $_GET['month_of'] : date('Y-m');
 									<?php 
 									$i = 1;
 									$tamount = 0;
-									$payments  = $conn->query("SELECT p.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no FROM payments p inner join tenants t on t.id = p.tenant_id inner join houses h on h.id = t.house_id where date_format(p.date_created,'%Y-%m') = '$month_of' order by unix_timestamp(date_created)  asc");
+									$payments  = $conn->query("SELECT p.*,u.name as name,h.house_no FROM payments p inner join tenants t on t.id = p.tenant_id inner join houses h on h.id = t.house_id inner join users u on t.user_id = u.id where date_format(p.date_created,'%Y-%m') = '$month_of' order by unix_timestamp(date_created)  asc");
 									if($payments->num_rows > 0 ):
 									while($row=$payments->fetch_assoc()):
-										$tamount += $row['amount'];
+										$tamount += $row['total_amount'];
 									?>
 									<tr>
 										<td><?php echo $i++ ?></td>
 										<td><?php echo date('M d,Y',strtotime($row['date_created'])) ?></td>
 										<td><?php echo ucwords($row['name']) ?></td>
 										<td><?php echo $row['house_no'] ?></td>
-										<td><?php echo $row['invoice'] ?></td>
-										<td class="text-right"><?php echo number_format($row['amount'],2) ?></td>
+										<td class="text-right"><?php echo number_format($row['total_amount'],2) ?></td>
 									</tr>
 								<?php endwhile; ?>
 								<?php else: ?>

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2020 at 07:07 AM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.2.33
+-- Generation Time: Apr 18, 2024 at 01:05 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `categories` (
   `id` int(30) NOT NULL,
   `name` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `categories`
@@ -53,15 +53,17 @@ CREATE TABLE `houses` (
   `house_no` varchar(50) NOT NULL,
   `category_id` int(30) NOT NULL,
   `description` text NOT NULL,
-  `price` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `price` double NOT NULL,
+  `electricity_number` float NOT NULL,
+  `water_meter` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `houses`
 --
 
-INSERT INTO `houses` (`id`, `house_no`, `category_id`, `description`, `price`) VALUES
-(1, '623', 4, 'Sample', 2500);
+INSERT INTO `houses` (`id`, `house_no`, `category_id`, `description`, `price`, `electricity_number`, `water_meter`) VALUES
+(3, '504', 4, 'abcdfg', 3000000, 3000, 25000);
 
 -- --------------------------------------------------------
 
@@ -74,16 +76,21 @@ CREATE TABLE `payments` (
   `tenant_id` int(30) NOT NULL,
   `amount` float NOT NULL,
   `invoice` varchar(50) NOT NULL,
-  `date_created` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `electricity_number` int(11) NOT NULL,
+  `water_number` int(11) NOT NULL,
+  `date_created` datetime NOT NULL DEFAULT current_timestamp(),
+  `electricity_price` double NOT NULL,
+  `water_price` double NOT NULL,
+  `total_amount` double NOT NULL,
+  `status` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `payments`
 --
 
-INSERT INTO `payments` (`id`, `tenant_id`, `amount`, `invoice`, `date_created`) VALUES
-(1, 2, 2500, '123456', '2020-10-26 11:29:35'),
-(2, 2, 7500, '136654', '2020-10-26 11:30:21');
+INSERT INTO `payments` (`id`, `tenant_id`, `amount`, `invoice`, `electricity_number`, `water_number`, `date_created`, `electricity_price`, `water_price`, `total_amount`, `status`) VALUES
+(13, 7, 3000000, '', 12, 12, '2024-04-15 22:18:40', 36000, 300000, 3336000, 1);
 
 -- --------------------------------------------------------
 
@@ -98,7 +105,7 @@ CREATE TABLE `system_settings` (
   `contact` varchar(20) NOT NULL,
   `cover_img` text NOT NULL,
   `about_content` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `system_settings`
@@ -115,22 +122,18 @@ INSERT INTO `system_settings` (`id`, `name`, `email`, `contact`, `cover_img`, `a
 
 CREATE TABLE `tenants` (
   `id` int(30) NOT NULL,
-  `firstname` varchar(100) NOT NULL,
-  `middlename` varchar(100) NOT NULL,
-  `lastname` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `contact` varchar(50) NOT NULL,
   `house_id` int(30) NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = active, 0= inactive',
-  `date_in` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `date_in` date NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tenants`
 --
 
-INSERT INTO `tenants` (`id`, `firstname`, `middlename`, `lastname`, `email`, `contact`, `house_id`, `status`, `date_in`) VALUES
-(2, 'John', 'C', 'Smith', 'jsmith@sample.com', '+18456-5455-55', 1, 1, '2020-07-02');
+INSERT INTO `tenants` (`id`, `house_id`, `status`, `date_in`, `user_id`) VALUES
+(7, 3, 1, '2024-04-08', 4);
 
 -- --------------------------------------------------------
 
@@ -143,15 +146,18 @@ CREATE TABLE `users` (
   `name` text NOT NULL,
   `username` varchar(200) NOT NULL,
   `password` text NOT NULL,
-  `type` tinyint(1) NOT NULL DEFAULT 2 COMMENT '1=Admin,2=Staff'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `type` tinyint(1) NOT NULL DEFAULT 2 COMMENT '1=Admin,2=Staff',
+  `phone` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `password`, `type`) VALUES
-(1, 'Administrator', 'admin', '0192023a7bbd73250516f069df18b500', 1);
+INSERT INTO `users` (`id`, `name`, `username`, `password`, `type`, `phone`, `email`) VALUES
+(1, 'Administrator', 'admin', '0192023a7bbd73250516f069df18b500', 1, '0964054736', 'admin@gmail.com'),
+(4, 'nam', 'namnpp', '54e193277215c92570bc9659bd48ff40', 2, '0964054736', 'ngophamphuongnam1999bg@gmail.com');
 
 --
 -- Indexes for dumped tables
@@ -207,13 +213,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `houses`
 --
 ALTER TABLE `houses`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
@@ -225,13 +231,13 @@ ALTER TABLE `system_settings`
 -- AUTO_INCREMENT for table `tenants`
 --
 ALTER TABLE `tenants`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
