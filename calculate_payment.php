@@ -20,6 +20,10 @@ foreach($qry->fetch_array() as $k => $val){
 				<input type="number" class="form-control" name="electricity_number"  value="" required>
 			</div>
 		</div>
+		<div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id='submit' onclick="$('#uni_modal').submit()">Save</button>
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
 	</form>
 </div>
 <script>

@@ -16,7 +16,7 @@ ob_end_flush();
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title><?php echo $_SESSION['system']['name'] ?></title>
+  <title><?php echo 'Dream House' ?></title>
  	
 
 <?php include('./header.php'); ?>
@@ -93,7 +93,7 @@ div#login-right::before {
 
   		<div id="login-right" class="bg-light">
   			<div class="w-100">
-			<h4 class="text-white text-center"><b><?php echo $_SESSION['system']['name'] ?></b></h4>
+			<h4 class="text-black text-center"><b><?php echo $_SESSION['system']['name'] ?></b></h4>
 			<br>
 			<br>
   			<div class="card col-md-8">
@@ -139,7 +139,9 @@ div#login-right::before {
 			success:function(resp){
 				if(resp == 1){
 					location.href ='index.php?page=home';
-				}else{
+				} else if (resp == 2){
+					location.href ='index.php?page=tenants';
+				} else {
 					$('#login-form').prepend('<div class="alert alert-danger">Username or password is incorrect.</div>')
 					$('#login-form button[type="button"]').removeAttr('disabled').html('Login');
 				}

@@ -7,13 +7,23 @@ foreach($tenants as $k => $v){
 		$$k = $v;
 	}
 }
-$months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($date_in." 23:59:59"));
+$id = $_GET['id'];
+$date = $conn->query("SELECT date_in FROM tenants where id =".$id)->fetch_array()['date_in'];
+$months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($date." 23:59:59"));
 $months = floor(($months) / (30*60*60*24));
 $payable = $price * $months;
-$paid = $conn->query("SELECT SUM(amount) as paid FROM payments where tenant_id =".$_GET['id']);
+$user = $conn->query("SELECT u.name FROM tenants t inner join users u on t.user_id = u.id where t.id =".$id)->fetch_array()['name'];
+$paid = $conn->query("SELECT SUM(total_amount) as paid FROM payments where tenant_id =".$id);
 $last_payment = $conn->query("SELECT * FROM payments where tenant_id =".$_GET['id']." order by unix_timestamp(date_created) desc limit 1");
 $paid = $paid->num_rows > 0 ? $paid->fetch_array()['paid'] : 0;
-$last_payment = $last_payment->num_rows > 0 ? date("M d, Y",strtotime($last_payment->fetch_array()['date_created'])) : 'N/A';
+$last_payment_date =  'N/A';
+$last_payment_electricity = 'N/A';
+$last_payment_water = 'N/A';
+if ($last_payment->num_rows > 0) {
+	$last_payment= $last_payment->fetch_array();
+	$last_payment_electricity = $last_payment['electricity_number'];
+	$last_payment_water = $last_payment['water_number'];
+}
 $outstanding = $payable - $paid;
 
 ?>
@@ -22,19 +32,20 @@ $outstanding = $payable - $paid;
 		<div class="row">
 			<div class="col-md-4">
 				<div id="details">
-					<large><b>Details</b></large>
+					<large><b>Chi Tiết</b></large>
 					<hr>
-					<p>Tenant: <b><?php echo ucwords($name) ?></b></p>
-					<p>Monthly Rental Rate: <b><?php echo number_format($price,2) ?></b></p>
-					<p>Electricity Number: <b><?php echo $tenants['electricity_number'] ?></b></p>
-					<p>water meter: <b><?php echo $tenants['water_meter'] ?></b></p>
-					<p>Monthly Rental Rate: <b><?php echo number_format($price,2) ?></b></p>
-					<p>Total Paid: <b><?php echo number_format($paid,2) ?></b></p>
-					<p>Rent Started: <b><?php echo date("M d, Y",strtotime($date_in)) ?></b></p>
+					<p>Tên khách hàng: <b><?php echo ucwords($user) ?></b></p>
+					<p>Tiền nhà hàng tháng: <b><?php echo number_format($price,2) ?></b></p>
+					<p>Tiền điện/số: <b><?php echo $tenants['electricity_number'] ?></b></p>
+					<p>Tiền nước/số: <b><?php echo $tenants['water_meter'] ?></b></p>
+					<p>Số điện đã sử dụng: <b><?php echo $last_payment_electricity ?></b></p>
+					<p>Số nước: <b><?php echo $last_payment_water ?></b></p>
+					<p>Tổng số tiền đã trả: <b><?php echo number_format($paid,2) ?></b></p>
+					<p>Ngày bắt đầu thuê: <b><?php echo date("M d, Y",strtotime($date)) ?></b></p>
 				</div>
 			</div>
 			<div class="col-md-8">
-				<large><b>Payment List</b></large>
+				<large><b>Danh sách thanh toán</b></large>
 					<hr>
 				<table class="table table-condensed table-striped">
 					<thead>
@@ -45,7 +56,7 @@ $outstanding = $payable - $paid;
 					</thead>
 					<tbody>
 						<?php 
-						$payments = $conn->query("SELECT * FROM payments where tenant_id = $id");
+						$payments = $conn->query("SELECT * FROM payments where tenant_id = $id and status = 1");
 						if($payments->num_rows > 0):
 						while($row=$payments->fetch_assoc()):
 						?>
@@ -62,6 +73,9 @@ $outstanding = $payable - $paid;
 		</div>
 	</div>
 </div>
+<div class="modal-footer">
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
 <style>
 	#details p {
 		margin: unset;

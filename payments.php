@@ -15,7 +15,7 @@
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
-						<b>List of Payments</b>
+						<b>Danh sách thanh toán</b>
 						<span class="float:right"><a class="btn btn-primary btn-block btn-sm col-sm-2 float-right" href="javascript:void(0)" id="momo">
 					<i class="fa fa-plus"></i> MoMo
 						<span class="float:right"><a class="btn btn-primary btn-block btn-sm col-sm-2 float-right" href="javascript:void(0)" id="new_payment">
@@ -105,7 +105,7 @@
 		
 	})
 	$('.view_payment').click(function(){
-		uni_modal("Tenants Payments","view_payment.php?id="+$(this).attr('data-id'),"mid-large")
+		uni_modal("Chi Tiết Hợp Đồng","view_payment.php?id="+$(this).attr('data-id'),"mid-large")
 		
 	})
 	$('.delete_payment').click(function(){

@@ -13,7 +13,7 @@ foreach($qry->fetch_array() as $k => $val){
 		<div class="form-group row">
 			<div class="col-md-4">
 				<label for="" class="control-label">Customer</label>
-				<select name="user_id" id="" class="custom-select select2">
+				<select name="user_id" id="" class="custom-select select2" required>
 					<option value=""></option>
 					<?php 
 					$users = $conn->query("SELECT * FROM users where type != 1");
@@ -25,13 +25,13 @@ foreach($qry->fetch_array() as $k => $val){
 			</div>
 			<div class="col-md-4">
 				<label for="" class="control-label">House</label>
-				<select name="house_id" id="" class="custom-select select2">
+				<select name="house_id" id="" class="custom-select select2" required>
 					<option value=""></option>
 					<?php 
 					$house = $conn->query("SELECT * FROM houses where id not in (SELECT house_id from tenants where status = 1) ".(isset($house_id)? " or id = $house_id": "" )." ");
 					while($row= $house->fetch_assoc()):
 					?>
-					<option value="<?php echo $row['id'] ?>" <?php echo isset($house_id) && $house_id == $row['id'] ? 'selected' : '' ?>><?php echo $row['house_no'] ?></option>
+					<option  value="<?php echo $row['id'] ?>" <?php echo isset($house_id) && $house_id == $row['id'] ? 'selected' : '' ?>><?php echo $row['house_no'] ?></option>
 					<?php endwhile; ?>
 				</select>
 			</div>
@@ -40,6 +40,10 @@ foreach($qry->fetch_array() as $k => $val){
 				<input type="date" class="form-control" name="date_in"  value="<?php echo isset($date_in) ? date("Y-m-d",strtotime($date_in)) :'' ?>" required>
 			</div>
 		</div>
+		<div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id='submit' onclick="$('#uni_modal').submit()">Save</button>
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
 	</form>
 </div>
 <script>

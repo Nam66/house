@@ -52,7 +52,7 @@
                                         <h4><b>
                                             <?php echo $conn->query("SELECT * FROM houses")->num_rows ?>
                                         </b></h4>
-                                        <p><b>Total Houses</b></p>
+                                        <p><b>Số Phòng</b></p>
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -72,7 +72,7 @@
                                         <h4><b>
                                             <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
                                         </b></h4>
-                                        <p><b>Total Tenants</b></p>
+                                        <p><b>Số Hợp Đồng</b></p>
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -95,7 +95,7 @@
                                              echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'],2) : 0;
                                              ?>
                                         </b></h4>
-                                        <p><b>Payments This Month</b></p>
+                                        <p><b>Thanh Toán tháng này</b></p>
                                     </div>
                                 </div>
                                 <div class="card-footer">

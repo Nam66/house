@@ -9,12 +9,12 @@
 			<form action="" id="manage-category">
 				<div class="card">
 					<div class="card-header">
-						    Category Form
+						    Loại Phòng
 				  	</div>
 					<div class="card-body">
 							<input type="hidden" name="id">
 							<div class="form-group">
-								<label class="control-label">Name</label>
+								<label class="control-label">Tên</label>
 								<input type="text" class="form-control" name="name">
 							</div>
 					</div>
@@ -36,7 +36,7 @@
 			<div class="col-md-8">
 				<div class="card">
 					<div class="card-header">
-						<b>Category List</b>
+						<b>Danh Sách Loại Phòng</b>
 					</div>
 					<div class="card-body">
 						<table class="table table-bordered table-hover">
@@ -102,7 +102,7 @@
 
 				}
 				else if(resp==2){
-					alert_toast("Data successfully updated",'success')
+					alert_toast("Category already exist.",'danger')
 					setTimeout(function(){
 						location.reload()
 					},1500)

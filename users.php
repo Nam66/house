@@ -5,13 +5,18 @@
 <div class="container-fluid">
 	
 	<div class="row">
-	<div class="col-lg-12">
-			<button class="btn btn-primary float-right btn-sm" id="new_user"><i class="fa fa-plus"></i> New user</button>
+		<div class="col-lg-12">
+				
+		</div>
 	</div>
-	</div>
-	<br>
 	<div class="row">
 		<div class="card col-lg-12">
+		<div class="card">
+					<div class="card-header" style="<?=$style?>">
+						<b>Danh sách người dùng</b>
+						<a class="btn btn-primary float-right btn-sm" id="new_user" href="javascript:void(0)"><i class="fa fa-plus"></i> New user</a>
+				</a></span>
+					</div>
 			<div class="card-body">
 				<table class="table-striped table-bordered col-md-12">
 			<thead>
@@ -88,11 +93,16 @@ $('.delete_user').click(function(){
 			data:{id:$id},
 			success:function(resp){
 				if(resp==1){
-					alert_toast("Data successfully deleted",'success')
+					alert_toast("Xóa thành công.",'success')
 					setTimeout(function(){
 						location.reload()
 					},1500)
 
+				}else {
+					alert_toast("Khách hàng vẫn còn hợp đồng.",'danger')
+					setTimeout(function(){
+						location.reload()
+					},1500)
 				}
 			}
 		})

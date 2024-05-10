@@ -1,9 +1,11 @@
 <?php include('db_connect.php');?>
 <?php
 if ($_SESSION['login_type'] == 1):
+	$styleCal = 'display:none;';
 	$style = '';
 else:
     $style = 'display:none;';
+	$styleCal = '';
 endif; 
 ?>
 <div class="container-fluid">
@@ -21,7 +23,7 @@ endif;
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header" style="<?=$style?>">
-						<b>List of Tenant</b>
+						<b>Danh sách hợp đồng</b>
 						<span class="float:right"><a class="btn btn-primary btn-block btn-sm col-sm-2 float-right" href="javascript:void(0)" id="new_tenant">
 					<i class="fa fa-plus"></i> New Tenant
 				</a></span>
@@ -43,11 +45,11 @@ endif;
 								$i = 1;
 								if ($_SESSION['login_type'] == 1):
 									$styleForm = 'display:none;';
-									$tenant = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id order by h.house_no desc ");
+									$tenant = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where status = 1 order by h.house_no desc ");
 								else:
 									$styleForm = '';
 									$user_id = $_SESSION['login_id'];
-									$tenant = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where u.id = $user_id  order by h.house_no desc ");
+									$tenant = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where status = 1 and u.id = $user_id  order by h.house_no desc ");
 								endif;
 								while($row=$tenant->fetch_assoc()):
 									$months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($row['date_in']." 23:59:59"));
@@ -73,10 +75,10 @@ endif;
 										 <p><b><?php echo  $last_payment ?></b></p>
 									</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-outline-primary calculate_payment" type="button" style="<?=$style?>" data-id="<?php echo $row['id'] ?>" >Calculate</button>
+										<button class="btn btn-sm btn-outline-primary calculate_payment" type="button" style="<?=$styleCal?>" data-id="<?php echo $row['id'] ?>" >Calculate</button>
 										<button class="btn btn-sm btn-outline-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>" >View</button>
 										<button class="btn btn-sm btn-outline-primary edit_tenant" type="button" style="<?=$style?>" data-id="<?php echo $row['id'] ?>" >Edit</button>
-										<button class="btn btn-sm btn-outline-danger delete_tenant" type="button" style="<?=$style?>" data-id="<?php echo $row['id'] ?>">Delete</button>
+										<button class="btn btn-sm btn-outline-danger delete_tenant" type="button" style="<?=$style?>" house-id ="<?php echo $row['house_id'] ?>" data-id="<?php echo $row['id'] ?>">Delete</button>
 									</td>
 								</tr>
 								<?php endwhile; ?>
@@ -120,22 +122,22 @@ endif;
 	})
 
 	$('.view_payment').click(function(){
-		uni_modal("Tenants Payments","view_payment.php?id="+$(this).attr('data-id'),"large")
+		uni_modal("Chi Tiết Hợp Đồng","view_payment.php?id="+$(this).attr('data-id'),"large")
 	})
 	$('.edit_tenant').click(function(){
 		uni_modal("Manage Tenant Details","manage_tenant.php?id="+$(this).attr('data-id'),"mid-large")
 		
 	})
 	$('.delete_tenant').click(function(){
-		_conf("Are you sure to delete this Tenant?","delete_tenant",[$(this).attr('data-id')])
+		_conf("Are you sure to delete this Tenant?","delete_tenant",[$(this).attr('data-id'), $(this).attr('house-id')])
 	})
 	
-	function delete_tenant($id){
+	function delete_tenant($id, $house_id){
 		start_load()
 		$.ajax({
 			url:'ajax.php?action=delete_tenant',
 			method:'POST',
-			data:{id:$id},
+			data:{id:$id, house_id: $house_id},
 			success:function(resp){
 				if(resp==1){
 					alert_toast("Data successfully deleted",'success')

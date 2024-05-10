@@ -23,11 +23,11 @@ foreach($user->fetch_array() as $k =>$v){
 		</div>
 		<div class="form-group">
 			<label for="email">Email</label>
-			<input type="email" name="email" id="email" class="form-control" value="<?php echo isset($meta['email']) ? $meta['email']: '' ?>" required  autocomplete="off">
+			<input type="email" name="email" id="email" class="form-control" value="<?php echo isset($meta['email']) ? $meta['email']: '' ?>" required  autocomplete="off" required>
 		</div>
 		<div class="form-group">
 			<label for="username">Phone</label>
-			<input type="text" name="phone" id="phone" class="form-control" value="<?php echo isset($meta['phone']) ? $meta['phone']: '' ?>" required  autocomplete="off">
+			<input type="text" name="phone" id="phone" class="form-control" value="<?php echo isset($meta['phone']) ? $meta['phone']: '' ?>" required  autocomplete="off" required>
 		</div>
 		<div class="form-group">
 			<label for="password">Password</label>
@@ -49,28 +49,31 @@ foreach($user->fetch_array() as $k =>$v){
 		</div>
 		<?php endif; ?>
 		<?php endif; ?>
-		
-
+		<div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id='submit' onclick="$('#uni_modal').submit()">Save</button>
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
 	</form>
 </div>
 <script>
-	
 	$('#manage-user').submit(function(e){
 		e.preventDefault();
 		start_load()
 		$.ajax({
 			url:'ajax.php?action=save_user',
-			method:'POST',
 			data:$(this).serialize(),
+			type:'POST',
 			success:function(resp){
 				if(resp ==1){
 					alert_toast("Data successfully saved",'success')
 					setTimeout(function(){
 						location.reload()
 					},1500)
-				}else{
-					$('#msg').html('<div class="alert alert-danger">Username already exist</div>')
-					end_load()
+				}else if(resp==2){
+					alert_toast("Username already existed.",'danger')
+					setTimeout(function(){
+						location.reload()
+					},1500)
 				}
 			}
 		})

@@ -24,13 +24,9 @@ Class Action {
 					if($key != 'password' && !is_numeric($key))
 						$_SESSION['login_'.$key] = $value;
 				}
-				// if($_SESSION['login_type'] != 1){
-				// 	foreach ($_SESSION as $key => $value) {
-				// 		unset($_SESSION[$key]);
-				// 	}
-				// 	return 2 ;
-				// 	exit;
-				// }
+				if($_SESSION['login_type'] != 1){
+					return 2 ;
+				}
 					return 1;
 			}else{
 				return 3;
@@ -85,36 +81,42 @@ Class Action {
 
 	function save_user(){
 		extract($_POST);
-		$data = " name = '$name' ";
-		$data .= ", username = '$username' ";
-		$data .= ", email = '$email' ";
-		$data .= ", phone = '$phone' ";
-		if(!empty($password))
-			$data .= ", password = '".md5($password)."' ";
-		if(isset($type))
-			$data .= ", type = '$type' ";
-		// if($type == 1)
-		// 	$establishment_id = 0;
-		// $data .= ", establishment_id = '$establishment_id' ";
-		$chk = $this->db->query("Select * from users where username = '$username' and id !='$id' ")->num_rows;
-		if($chk > 0){
-			return 2;
-			exit;
-		}
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO users set ".$data);
-		}else{
-			$save = $this->db->query("UPDATE users set ".$data." where id = ".$id);
-		}
-		if($save){
-			return 1;
+		if (isset($name) && isset($username) && isset($email) && isset($phone)) {
+			$data = " name = '$name' ";
+			$data .= ", username = '$username' ";
+			$data .= ", email = '$email' ";
+			$data .= ", phone = '$phone' ";
+			if(!empty($password))
+				$data .= ", password = '".md5($password)."' ";
+			if(isset($type))
+				$data .= ", type = '$type' ";
+			// if($type == 1)
+			// 	$establishment_id = 0;
+			// $data .= ", establishment_id = '$establishment_id' ";
+			$chk = $this->db->query("Select * from users where username = '$username' and id !='$id' ")->num_rows;
+			if($chk > 0){
+				return 2;
+			}
+			if(empty($id)){
+				$save = $this->db->query("INSERT INTO users set ".$data);
+			}else{
+				$save = $this->db->query("UPDATE users set ".$data." where id = ".$id);
+			}
+			if($save){
+				return 1;
+			}
 		}
 	}
 	function delete_user(){
-		extract($_POST);
-		$delete = $this->db->query("DELETE FROM users where id = ".$id);
-		if($delete)
-			return 1;
+		try {
+			extract($_POST);
+			$delete = $this->db->query("DELETE FROM users where id = ".$id);
+			if($delete)
+				return 1;
+		} catch (Exception $e) {
+			return 2;
+		}
+		
 	}
 	function signup(){
 		extract($_POST);
@@ -229,6 +231,9 @@ Class Action {
 	function save_category(){
 		extract($_POST);
 		$data = " name = '$name' ";
+		$chk = $this->db->query("SELECT * FROM categories where name = '$name' ")->num_rows;
+		if($chk > 0)
+		return 2;
 			if(empty($id)){
 				$save = $this->db->query("INSERT INTO categories set $data");
 			}else{
@@ -251,6 +256,8 @@ Class Action {
 		$data .= ", category_id = '$category_id' ";
 		$data .= ", electricity_number = '$electricity_number' ";
 		$data .= ", water_meter = '$water_meter' ";
+		$data .= ", service_price = '$service_price' ";
+		$data .= ", wifi = '$wifi' ";
 		$data .= ", price = '$price' ";
 		$chk = $this->db->query("SELECT * FROM houses where house_no = '$house_no' ")->num_rows;
 		if($chk > 0 ){
@@ -275,8 +282,10 @@ Class Action {
 		$data .= ", date_in = '$date_in' ";
 			if(empty($id)){
 				$save = $this->db->query("INSERT INTO tenants set $data");
+				$save2 = $this->db->query("UPDATE houses set house_status = 1  where id = $house_id ");
 			}else{
 				$save = $this->db->query("UPDATE tenants set $data where id = $id");
+				$save2 = $this->db->query("UPDATE houses set house_status = 1 where id = $house_id ");
 			}
 		if($save)
 			return 1;
@@ -285,6 +294,7 @@ Class Action {
 		extract($_POST);
 		$delete = $this->db->query("UPDATE tenants set status = 0 where id = ".$id);
 		if($delete){
+			$this->db->query("UPDATE houses set house_status = 0 where id = $house_id ");
 			return 1;
 		}
 	}
@@ -362,6 +372,11 @@ Class Action {
 	function calculate_payment(){
 		extract($_POST);
 		$tenants =$this->db->query("SELECT * FROM tenants t inner join houses h on h.id = t.house_id where t.id = {$id} ")->fetch_array();
+		$lastElectricNumberData = $this->db->query("SELECT electricity_number FROM payments where tenant_id = {$id} order by unix_timestamp(date_created) desc limit 1 ");
+		$lastElectricNumber = 0;
+		if ($lastElectricNumberData->num_rows > 0) {
+			$lastElectricNumber = $lastElectricNumberData->fetch_array()['electricity_number'];
+		}
 		if(empty($tenants)) { 
 			return 2;
 		}
@@ -369,7 +384,7 @@ Class Action {
 		$price = $tenants['price'];
 		$house_electricity_number = $tenants['electricity_number'];
 		$house_water_meter = $tenants['water_meter'];
-		$electricity_price = $electricity_number * $house_electricity_number;
+		$electricity_price = ($electricity_number - $lastElectricNumber) * $house_electricity_number;
 		$water_price = $house_water_meter * $water_number;
 		$total_amount = $tenants['price'] + $electricity_price + $water_price;
 		$POST['electricity_price'] =  $electricity_price;

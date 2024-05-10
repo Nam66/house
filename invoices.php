@@ -1,4 +1,16 @@
 <?php include('db_connect.php');?>
+<?php
+if ($_SESSION['login_type'] == 1):
+	$style = '';
+	$styleForm = 'display:none;';
+	$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id order by date(p.date_created) desc ");
+else:
+	$styleForm = '';
+	$style = 'display:none;';
+	$user_id = $_SESSION['login_id'];
+	$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id and u.id = $user_id order by date(p.date_created) desc ");
+endif;
+?>
 
 <div class="container-fluid">
 	
@@ -15,7 +27,7 @@
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
-						<b>List of Payments</b>
+						<b>Danh sách thanh toán</b>
 					</div>
 					<div class="card-body">
 						<table class="table table-condensed table-bordered table-hover">
@@ -26,22 +38,12 @@
 									<th class="">Tenant</th>
 									<th class="">Amount</th>
 									<th class="">Status</th>
-									<th class="text-center">Action</th>
+									<th style="<?=$styleForm?>" class="text-center">Action</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php 
 								$i = 1;
-								if ($_SESSION['login_type'] == 1):
-									$style = '';
-									$styleForm = 'display:none;';
-									$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id order by date(p.date_created) desc ");
-								else:
-									$styleForm = '';
-									$style = 'display:none;';
-									$user_id = $_SESSION['login_id'];
-									$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id and u.id = $user_id order by date(p.date_created) desc ");
-								endif;
 								while($row=$invoices->fetch_assoc()):
 								?>
 								<tr>
@@ -56,15 +58,13 @@
 										 <p> <b><?php echo number_format($row['total_amount'],2) ?></b></p>
 									</td>
 									<td class="text-right">
-										 <p> <b><?php echo ($row['status'] ? 'Paid' : 'In Process') ?></b></p>
+										 <p> <b><?php echo ($row['status'] ? 'Đã thanh toán' : 'Chưa thanh toán') ?></b></p>
 									</td>
-									<td class="text-center">
-										<form method="POST" target="_blank" enctype="application/x-www-form-urlencoded" style='<?=$styleForm?>' class="" action="momo.php">
+									<td class="text-center"  style='<?=$styleForm?>'>
+										<form method="POST" target="_blank" enctype="application/x-www-form-urlencoded" class="" action="momo.php">
 											<input type="hidden" name="id" value="<?php echo $row['id'] ?>">
-											<button  type="submit" name="momo" id="momo"  class="btn btn-sm btn-outline-danger">Pay</button>
+											<button  type="submit" name="momo" id="momo" <?php echo ($row['status'] ? 'disabled' : '') ?>  class="btn btn-sm btn-outline-danger">Pay</button>
 										</form>
-										<button class="btn btn-sm btn-outline-primary edit_invoice" style="<?=$style?>" type="button" data-id="<?php echo $row['id'] ?>" >Edit</button>
-										<button class="btn btn-sm btn-outline-danger delete_invoice" style="<?=$style?>" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
 									</td>
 								</tr>
 								<?php endwhile; ?>
