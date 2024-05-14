@@ -1,15 +1,8 @@
 <?php include('db_connect.php');?>
 <?php
-if ($_SESSION['login_type'] == 1):
-	$style = '';
-	$styleForm = 'display:none;';
-	$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id order by date(p.date_created) desc ");
-else:
-	$styleForm = '';
-	$style = 'display:none;';
-	$user_id = $_SESSION['login_id'];
-	$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id and u.id = $user_id order by date(p.date_created) desc ");
-endif;
+$currentMonth = date('m');
+$currentYear = date('Y');
+$invoices = $conn->query("SELECT p.*,u.name as name FROM payments p inner join tenants t on t.id = p.tenant_id inner join users u on u.id = t.user_id where MONTH(p.date_created) = $currentMonth and YEAR(p.date_created) = $currentYear");
 ?>
 
 <div class="container-fluid">
@@ -27,7 +20,7 @@ endif;
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
-						<b>Danh sách thanh toán</b>
+						<b>Danh sách hợp đồng chưa thanh toán</b>
 					</div>
 					<div class="card-body">
 						<table class="table table-condensed table-bordered table-hover">

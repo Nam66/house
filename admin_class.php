@@ -259,6 +259,7 @@ Class Action {
 		$data .= ", service_price = '$service_price' ";
 		$data .= ", wifi = '$wifi' ";
 		$data .= ", price = '$price' ";
+		$data .= ", belongings = '$belongings' ";
 		$chk = $this->db->query("SELECT * FROM houses where house_no = '$house_no' ")->num_rows;
 		if($chk > 0 ){
 			$save = $this->db->query("UPDATE houses set $data where id = $id");

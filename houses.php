@@ -57,6 +57,10 @@
 								<label class="control-label">Tiền wifi</label>
 								<input type="number" class="form-control text-right" name="wifi" step="any" required="">
 							</div>
+							<div class="form-group">
+								<label class="control-label">Đồ dùng</label>
+								<textarea class="form-control" name="belongings" step="any" required=""></textarea>
+							</div>
 					</div>
 					<div class="card-footer">
 						<div class="row">
@@ -102,7 +106,7 @@
 										<p><small>trạng thái: <b><?php echo ($row['house_status']) ? 'Đã thuê' : 'còn trống' ?></b></small></p>
 									</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-primary edit_house" type="button" data-id="<?php echo $row['id'] ?>"  data-house_no="<?php echo $row['house_no'] ?>" data-description="<?php echo $row['description'] ?>" data-category_id="<?php echo $row['category_id'] ?>" data-price="<?php echo $row['price'] ?>" data-electricity_number="<?php echo $row['electricity_number'] ?>" data-water_meter="<?php echo $row['water_meter'] ?>" >Edit</button>
+										<button class="btn btn-sm btn-primary edit_house" type="button" data-id="<?php echo $row['id'] ?>"  data-house_no="<?php echo $row['house_no'] ?>" data-description="<?php echo $row['description'] ?>" data-category_id="<?php echo $row['category_id'] ?>" data-price="<?php echo $row['price'] ?>" data-electricity_number="<?php echo $row['electricity_number'] ?>" data-water_meter="<?php echo $row['water_meter'] ?>" data-service_price="<?php echo $row['service_price'] ?>" data-wifi="<?php echo $row['wifi'] ?>" data-belongings="<?php echo $row['belongings'] ?>" >Edit</button>
 										<button class="btn btn-sm btn-danger delete_house" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
 									</td>
 								</tr>
@@ -169,6 +173,11 @@
 		cat.find("[name='price']").val($(this).attr('data-price'))
 		cat.find("[name='electricity_number']").val($(this).attr('data-electricity_number'))
 		cat.find("[name='water_meter']").val($(this).attr('data-water_meter'))
+		cat.find("[name='electricity_number']").val($(this).attr('data-electricity_number'))
+		cat.find("[name='water_meter']").val($(this).attr('data-water_meter'))
+		cat.find("[name='service_price']").val($(this).attr('data-service_price'))
+		cat.find("[name='wifi']").val($(this).attr('data-wifi'))
+		cat.find("[name='belongings']").val($(this).attr('data-belongings'))
 		end_load()
 	})
 	$('.delete_house').click(function(){

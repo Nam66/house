@@ -36,9 +36,8 @@ $redirectUrl = "http://localhost/house_rental/index.php?page=invoices";
 $ipnUrl = "http://localhost/house_rental/index.php?page=invoices";
 $extraData = "";
 
-
-if (!empty($_POST)):
-    $id = $_POST["id"];
+if (!empty($_GET)):
+    $id = $_GET["id"];
     $extraData = $id;
     $invoices = $conn->query("SELECT * FROM payments where id=$id and status = 0")->fetch_array();
     $amount = $invoices['total_amount'];

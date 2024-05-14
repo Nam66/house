@@ -1,7 +1,7 @@
 <?php include 'db_connect.php' ?>
 
 <?php 
-$tenants = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price,h.electricity_number,h.water_meter FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where t.status = 1 order by h.house_no desc ")->fetch_array();
+$tenants = $conn->query("SELECT t.*,u.name as name,h.house_no,h.price,h.electricity_number,h.water_meter,h.belongings FROM tenants t inner join houses h on h.id = t.house_id inner join users u on u.id = t.user_id where t.status = 1 order by h.house_no desc ")->fetch_array();
 foreach($tenants as $k => $v){
 	if(!is_numeric($k)){
 		$$k = $v;
@@ -9,6 +9,7 @@ foreach($tenants as $k => $v){
 }
 $id = $_GET['id'];
 $date = $conn->query("SELECT date_in FROM tenants where id =".$id)->fetch_array()['date_in'];
+$house = $tenants = $conn->query("SELECT t.*,h.house_no,h.price,h.electricity_number,h.water_meter,h.belongings FROM tenants t inner join houses h on h.id = t.house_id where t.status = 1 where t.id = $id ")->fetch_array();
 $months = abs(strtotime(date('Y-m-d')." 23:59:59") - strtotime($date." 23:59:59"));
 $months = floor(($months) / (30*60*60*24));
 $payable = $price * $months;
@@ -36,8 +37,9 @@ $outstanding = $payable - $paid;
 					<hr>
 					<p>Tên khách hàng: <b><?php echo ucwords($user) ?></b></p>
 					<p>Tiền nhà hàng tháng: <b><?php echo number_format($price,2) ?></b></p>
-					<p>Tiền điện/số: <b><?php echo $tenants['electricity_number'] ?></b></p>
-					<p>Tiền nước/số: <b><?php echo $tenants['water_meter'] ?></b></p>
+					<p>Tiền điện/số: <b><?php echo $house['electricity_number'] ?></b></p>
+					<p>Tiền nước/số: <b><?php echo $house['water_meter'] ?></b></p>
+					<p>Đồ dùng: <b><?php echo nl2br($house['belongings']) ?></b></p>
 					<p>Số điện đã sử dụng: <b><?php echo $last_payment_electricity ?></b></p>
 					<p>Số nước: <b><?php echo $last_payment_water ?></b></p>
 					<p>Tổng số tiền đã trả: <b><?php echo number_format($paid,2) ?></b></p>

@@ -75,7 +75,7 @@ endif;
 										 <p><b><?php echo  $last_payment ?></b></p>
 									</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-outline-primary calculate_payment" type="button" style="<?=$styleCal?>" data-id="<?php echo $row['id'] ?>" >Calculate</button>
+										<button class="btn btn-sm btn-outline-primary calculate_payment" type="button" style="<?=$style?>" data-id="<?php echo $row['id'] ?>" >Calculate</button>
 										<button class="btn btn-sm btn-outline-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>" >View</button>
 										<button class="btn btn-sm btn-outline-primary edit_tenant" type="button" style="<?=$style?>" data-id="<?php echo $row['id'] ?>" >Edit</button>
 										<button class="btn btn-sm btn-outline-danger delete_tenant" type="button" style="<?=$style?>" house-id ="<?php echo $row['house_id'] ?>" data-id="<?php echo $row['id'] ?>">Delete</button>

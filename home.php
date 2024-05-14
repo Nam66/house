@@ -108,8 +108,48 @@
                             </div>
                         </div>
                     </div>
-
-                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body bg-info">
+                                    <div class="card-body text-white">
+                                        <span class="float-right summary_icon"> <i class="fa fa-home "></i></span>
+                                        <h4><b>
+                                            <?php echo $conn->query("SELECT * FROM houses")->num_rows ?>
+                                        </b></h4>
+                                        <p><b>Hợp Đồng Sắp Hết Hạn</b></p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <a href="index.php?page=houses" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-danger">
+                                <div class="card-body bg-danger">
+                                    <div class="card-body text-white">
+                                        <span class="float-right summary_icon"> <i class="fa fa-user-friends "></i></span>
+                                        <h4><b>
+                                            <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
+                                        </b></h4>
+                                        <p><b>Hợp Đồng Chưa Thanh Toán</b></p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <a href="index.php?page=unpaid" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>      			
         </div>
